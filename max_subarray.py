@@ -1,6 +1,6 @@
 #Используем Kadane's algorithm для нахождений максимального подсписка в списке (сумма элементов максимальна).
 
-def max_array_ind(arr):
+def findMaxSubArray(A):
     start = 0
     end = 0
     best_sum = float('-inf') # Необходимо, чтобы алгоритм работал, если на вход подаются только отрицательные элементы. Если есть положительные,
@@ -8,7 +8,7 @@ def max_array_ind(arr):
     current_sum = 0
     #enumerate необходим, чтобы отслеживать индекс элемента и сам элемент. В то время, как в классическом алгоритме необходимо
     #знать только значение текущего элемента.
-    for i, x in enumerate(arr): 
+    for i, x in enumerate(A): 
         if x > current_sum + x:
             start = i
             current_sum = x
@@ -18,11 +18,15 @@ def max_array_ind(arr):
         if best_sum < current_sum:
             best_sum = current_sum
             end = i + 1 # +1 нужен, чтобы сделать правильный слайс, т.к. необходимо вернуть элементы до индекса end включительно.
-    return arr[start: end] #В качестве результата возвращаем слайс с максимальной суммой.
+    return A[start: end] #В качестве результата возвращаем слайс с максимальной суммой.
+    
 def main(): 
-    assert max_array_ind([-2,1,-3,4,-1,2,1,-5,4]) == [4, -1, 2, 1]
-    assert max_array_ind([-2, -1]) == [-1]
-    assert max_array_ind([5]) == [5]
+    assert findMaxSubArray([-2,1,-3,4,-1,2,1,-5,4]) == [4, -1, 2, 1]
+
+    assert findMaxSubArray([-2, -1]) == [-1]
+
+    assert findMaxSubArray([5]) == [5]
+
     print('Ok')
 
 if __name__ == '__main__':
