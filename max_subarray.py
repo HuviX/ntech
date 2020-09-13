@@ -28,8 +28,9 @@ def main():
 
     assert findMaxSubArray([5]) == [5]
     print('Ok')
-
-    # test_array = [] #Your Input
+    
+    # Чтобы протестировать, введите свой список
+    # test_array = [] 
     # ans = findMaxSubArray(test_array)
     # print(ans)
     
