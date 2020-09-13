@@ -14,8 +14,6 @@ import sys
 import pickle
 
 
-
-
 data_dir = sys.argv[1]
 
 model_name = 'inceptionv3'

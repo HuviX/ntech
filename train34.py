@@ -121,20 +121,6 @@ def main():
     model_name = "resnet34_"
     model, acc_hist, loss_hist = train_model(model, model_name, dataloader_dict, criterion, optimizer, scheduler, num_epochs, device)
 
-    # with open('outfile', 'wb') as fp:
-    #     pickle.dump(acc_hist, fp)
-    # with open('outfile2', 'wb') as fp:
-    #     pickle.dump(loss_hist, fp)
-
-    # plt.plot(acc_hist)
-    # plt.savefig('acc_hist.png')
-    # plt.show()
-    
-    # plt.plot(loss_hist)
-    # plt.savefig('loss_hist.png')
-    # plt.show()
-    # print("Done")
-
 if __name__ == '__main__':
     main()
 
