@@ -32,4 +32,3 @@ Kadane's Algorithm. Файл `max_subarray.py`.
 Для запуска обучения необходимо выполнить `python3 train34.py --path \path\to\train`. При этом можно задать дополнительные параметры, количество эпох и размер батча `python3 train34.py --path \path\to\train --n_epochs 10 --batch 128`. В ходе обучения в папку *logs* помешается информация об обучение, и можно наблюдать за ходом обучения в режиме реального времени. Для этого необходим tensroboard.
 Если нет, то `pip install tensorboard`. И когда запустилось обучение, то выполнить `tensorboard --logdir=logs/ --bind_all`.
 
-Второе задание
