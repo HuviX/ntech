@@ -41,7 +41,6 @@ def main():
         [0.229, 0.224, 0.225])
     ])
     to_json = {}
-    i = 0
     #Итерация по всем файлам в папке, применение к ним преобразований и получение предсказаний от сети
     for name in file_names:
         image = Image.open(path + '/' + name)
@@ -52,7 +51,6 @@ def main():
             _, preds = torch.max(output, dim = 1)
             predicted_class = preds.data.tolist()[0]
         predictions.append(mapping[predicted_class])
-        i+=1
         to_json[name] = mapping[predicted_class] 
 
     with open("process_results.json", "w") as outfile:  
