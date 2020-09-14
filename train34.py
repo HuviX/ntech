@@ -15,26 +15,25 @@ import pickle
 import argparse
 
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--n_epochs', help='epochs', default = 10)
 parser.add_argument('--path', help = 'train dataset path')
 parser.add_argument('--batch', help = 'batch size', default = 64)
 args = parser.parse_args()
 
-num_epochs = int(args.n_epochs)
+num_epochs = args.n_epochs
 data_dir = args.path
-batch_size = int(args.batch)
+batch_size = args.batch
 
-model_name = 'resnet34_'
+model_name = 'resnet34_pretrained'
 num_classes = 2
 input_size = 100 
 feature_extract = True
 
 def model_init():
-    model = models.resnet34(pretrained = True) #загружаем предобученную модель
+    model = models.resnet34(pretrained = False) #загружаем претрен 
     for param in model.parameters():
-            param.requires_grad = True #размораживаем обучение для всех слоёв.
+            param.requires_grad = True #замораживаем обучение для всех слоёв.
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, num_classes) # меняем последний слой
     return model
@@ -42,8 +41,7 @@ def model_init():
 def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler, num_epochs, device):
     val_acc_history = []
     val_loss_history = []
-    writer = SummaryWriter('logs/') # в логах будет сохраняться информация об обучении и можно наблюдать за обучением в Tensorboard
-    # tensorboard --logdir=logs/
+    writer = SummaryWriter('logs/')
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs-1}')
         for mode in ['train','val']:
@@ -79,7 +77,7 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                 val_loss_history.append(epoch_loss)
                 scheduler.step(epoch_loss)
 
-        name = f"model/{model_name}_{epoch}"
+        name = f"todays_model/{model_name}_{epoch}_no_aug"
         torch.save(model.state_dict(), name)
         writer.close()
     return model, val_acc_history, val_loss_history
@@ -89,9 +87,9 @@ def create_dataloader(data_dir):
     'train': transforms.Compose([
         transforms.Resize((input_size, input_size)), 
         transforms.RandomResizedCrop(input_size),
+        # transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(p=0.5),
-        transforms.RandomRotation((-30, 30)),
-        transforms.ToTensor(), 
+        transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], 
                              [0.229, 0.224, 0.225]) # нормализация данных
     ])
@@ -106,6 +104,8 @@ def create_dataloader(data_dir):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     return dataloader_dict, device
+
+
 
 def main():
     model = model_init()
@@ -130,8 +130,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     #имя модели, чтобы можно было делать чекпоинты каждую эпоху
     model_name = "resnet34_"
-    model, _, _ = train_model(model, model_name, dataloader_dict, criterion, optimizer, scheduler, num_epochs, device)
-    print("Model Training Finished")
+    model, acc_hist, loss_hist = train_model(model, model_name, dataloader_dict, criterion, optimizer, scheduler, num_epochs, device)
 
 if __name__ == '__main__':
     main()
