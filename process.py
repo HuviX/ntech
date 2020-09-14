@@ -32,7 +32,7 @@ def main():
     model = model_init(num_classes)
     model = model.to(device)
     model.eval()  
-    #Создаём объект, который будет преобразовывать входные данные для подания в сеть 
+    #Создаём объект, который будет преобразовывать входные данные для подачи в сеть 
     data_transforms = transforms.Compose([
         transforms.Resize(size),
         transforms.ToTensor(),
