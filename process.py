@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
@@ -17,7 +16,7 @@ def model_init(num_classes = 2):
     model =  models.resnet34(pretrained = False) #Загрузка модели
     model_path = 'models/resnet34__19'
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, num_classes)
+    model.fc = nn.Linear(num_ftrs, num_classes) #меняем последний слой
     print(f"Model Weights from {model_path}")
     model.load_state_dict(torch.load(model_path)) #Обученная модель
     return model
@@ -29,7 +28,7 @@ def main():
 
     file_names = os.listdir(path)
     predictions = []
-    
+    #инициализация модели и её трансфер на GPU (если есть). 
     model = model_init(num_classes)
     model = model.to(device)
     model.eval()  
@@ -43,6 +42,7 @@ def main():
     ])
     to_json = {}
     i = 0
+    #Итерация по всем файлам в папке, применение к ним преобразований и получение предсказаний от сети
     for name in file_names:
         image = Image.open(path + '/' + name)
         image = data_transforms(image)
