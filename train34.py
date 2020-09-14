@@ -5,36 +5,45 @@ import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.tensorboard import SummaryWriter
 
 import matplotlib.pyplot as plt
 import time
 import os
 import sys
 import pickle
+import argparse
 
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--n_epochs', help='epochs', default = 10)
+parser.add_argument('--path', help = 'train dataset path')
+parser.add_argument('--batch', help = 'batch size', default = 64)
+args = parser.parse_args()
 
+num_epochs = int(args.n_epochs)
+data_dir = args.path
+batch_size = int(args.batch)
 
-data_dir = sys.argv[1]
-model_name = 'resnet34_pretrained'
+model_name = 'resnet34_'
 num_classes = 2
-batch_size = 64
-num_epochs = 100
 input_size = 100 
 feature_extract = True
 
 def model_init():
-    model = models.resnet34(pretrained = True) #загружаем претрен 
+    model = models.resnet34(pretrained = True) #загружаем предобученную модель
     for param in model.parameters():
-            param.requires_grad = False #делаем обучение только для последнего слоя.
+            param.requires_grad = True #размораживаем обучение для всех слоёв.
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, num_classes)
+    model.fc = nn.Linear(num_ftrs, num_classes) # меняем последний слой
     return model
 
 def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler, num_epochs, device):
     val_acc_history = []
     val_loss_history = []
+    writer = SummaryWriter('logs/') # в логах будет сохраняться информация об обучении и можно наблюдать за обучением в Tensorboard
+    # tensorboard --logdir=logs/
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs-1}')
         for mode in ['train','val']:
@@ -49,7 +58,7 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                 labels = labels.to(device)
                 optimizer.zero_grad()
                 # Если валидация, то делам torch.no_grad()
-                with torch.set_grad_enabled(mode == 'train'): #
+                with torch.set_grad_enabled(mode == 'train'): 
                     outputs = model(images)
                     loss = criterion(outputs, labels)
                     _, preds = torch.max(outputs, dim = 1)
@@ -58,9 +67,11 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                         optimizer.step()
                 ovr_loss += loss.item() * images.size(0)
                 true_preds += torch.sum(preds == labels.data)
+
             epoch_loss = ovr_loss/ len(dataloaders[mode].dataset)
             epoch_acc = true_preds.double() / len(dataloaders[mode].dataset)
-            
+            writer.add_scalar(f"Loss/{mode}", epoch_loss, epoch)
+            writer.add_scalar(f"Accuracy/{mode}", epoch_acc, epoch)
             print(f"{mode} Loss: {epoch_loss}. Accuracy : {epoch_acc}")
             #Смотрим на функцию потерь на валидации и передаём значение в scheduler.
             if mode == 'val':
@@ -68,8 +79,9 @@ def train_model(model, model_name, dataloaders, criterion, optimizer, scheduler,
                 val_loss_history.append(epoch_loss)
                 scheduler.step(epoch_loss)
 
-        name = f"todays_model/{model_name}_{epoch}_no_aug"
+        name = f"model/{model_name}_{epoch}"
         torch.save(model.state_dict(), name)
+        writer.close()
     return model, val_acc_history, val_loss_history
 
 def create_dataloader(data_dir):
@@ -77,10 +89,11 @@ def create_dataloader(data_dir):
     'train': transforms.Compose([
         transforms.Resize((input_size, input_size)), 
         transforms.RandomResizedCrop(input_size),
-        # transforms.RandomHorizontalFlip(),
-        # transforms.RandomVerticalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) # нормализация данных
+        transforms.RandomVerticalFlip(p=0.5),
+        transforms.RandomRotation((-30, 30)),
+        transforms.ToTensor(), 
+        transforms.Normalize([0.485, 0.456, 0.406], 
+                             [0.229, 0.224, 0.225]) # нормализация данных
     ])
     }
     image_dataset = datasets.ImageFolder(data_dir, data_transforms['train'])
@@ -93,8 +106,6 @@ def create_dataloader(data_dir):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     return dataloader_dict, device
-
-
 
 def main():
     model = model_init()
@@ -119,7 +130,8 @@ def main():
     criterion = nn.CrossEntropyLoss()
     #имя модели, чтобы можно было делать чекпоинты каждую эпоху
     model_name = "resnet34_"
-    model, acc_hist, loss_hist = train_model(model, model_name, dataloader_dict, criterion, optimizer, scheduler, num_epochs, device)
+    model, _, _ = train_model(model, model_name, dataloader_dict, criterion, optimizer, scheduler, num_epochs, device)
+    print("Model Training Finished")
 
 if __name__ == '__main__':
     main()
