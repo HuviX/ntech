@@ -41,7 +41,7 @@ Kadane's Algorithm. Файл `max_subarray.py`.
 
 файлы `tfevents` представлены в папке `logs`.
 
-На отложенных 6к фотографиях модель показывает точность 98%. (:open_mouth:)
+На отложенных фотографиях (~3к + ~3к) модель показывает точность 98%. (:open_mouth:)
 ![значение точности на тесте](https://github.com/HuviX/ntech/blob/master/pics/test_acc.png)
 
 ### P.S:
