@@ -32,3 +32,13 @@ Kadane's Algorithm. Файл `max_subarray.py`.
 Для запуска обучения необходимо выполнить `python3 train34.py --path \path\to\train`. При этом можно задать дополнительные параметры, количество эпох и размер батча `python3 train34.py --path \path\to\train --n_epochs 10 --batch 128`. В ходе обучения в папку *logs* помешается информация об обучение, и можно наблюдать за ходом обучения в режиме реального времени. Для этого необходим tensroboard.
 Если нет, то `pip install tensorboard`. И когда запустилось обучение, то выполнить `tensorboard --logdir=logs/ --bind_all`.
 
+### Качество модели
+Модель обучалась 20 эпох, размер батча 128. Ниже представлены графики из tensorboard, показывающие изменение метрик
+![значение точности на обучающей и валид выборках](https://github.com/HuviX/ntech/blob/master/resnet_accuracy.png)
+![значение функции потерь (кроссэнтропия) на обучающей и валид выборках](https://github.com/HuviX/ntech/blob/master/loss_resnet.png)
+
+файлы `tfevents` представлены в папке `logs`.
+
+На отложенных 6к фотографиях модель показывает точность 98 процентов. 
+![значение точности на тесте](https://github.com/HuviX/ntech/blob/master/test_acc.png)
+
