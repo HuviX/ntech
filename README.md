@@ -34,11 +34,11 @@ Kadane's Algorithm. Файл `max_subarray.py`.
 
 ### Качество модели
 Модель обучалась 20 эпох, размер батча 128. Ниже представлены графики из tensorboard, показывающие изменение метрик
-![значение точности на обучающей и валид выборках](https://github.com/HuviX/ntech/blob/master/resnet_accuracy.png)
-![значение функции потерь (кроссэнтропия) на обучающей и валид выборках](https://github.com/HuviX/ntech/blob/master/loss_resnet.png)
+![значение точности на обучающей и валид выборках](https://github.com/HuviX/ntech/blob/master/pics/resnet_accuracy.png)
+![значение функции потерь (кроссэнтропия) на обучающей и валид выборках](https://github.com/HuviX/ntech/blob/master/pics/loss_resnet.png)
 
 файлы `tfevents` представлены в папке `logs`.
 
 На отложенных 6к фотографиях модель показывает точность 98 процентов. 
-![значение точности на тесте](https://github.com/HuviX/ntech/blob/master/test_acc.png)
+![значение точности на тесте](https://github.com/HuviX/ntech/blob/master/pics/test_acc.png)
 
